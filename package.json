@@ -36,5 +36,13 @@
   },
   "devDependencies": {
     "gh-pages": "^3.2.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateo-agl/sunrise-sunset.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mateo-agl/sunrise-sunset/issues"
+  },
+  "homepage": "https://mateo-agl.github.io/sunrise-sunset/"
 }
