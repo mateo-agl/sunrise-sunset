@@ -5,11 +5,12 @@ export const Search = ({ getMatches, getLocation, handleInput, city }) => {
     const selectCity = city => getLocation(city._links["city:item"].href);
     window.onkeydown = e => e.key === "Enter" ? search() : null;
     return (
-        <div className="form">
+        <div className="search-cont">
             <input
                 className="city-name"
                 onChange={handleInput}
                 value={city.name}
+                placeholder="City name"
             />
             <ul className="city-list">
                 {

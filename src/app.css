@@ -1,9 +1,18 @@
+* {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #363636;
+}
+
+body {
+    background: rgb(192, 192, 192);
+}
+
 .container {
     display: flex;
     flex-direction: column;
 }
 
-.form {
+.search-cont {
     width: fit-content;
     height: fit-content;
     position: relative;
@@ -60,6 +69,45 @@
     background: rgba(0, 132, 255, 0.288);
 }
 
-.axis path {
-    stroke: grey;
+#title {
+    margin: 1em 0 0 1em;
+}
+
+#chart-cont {
+    display: flexbox;
+    height: 624px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 6px 6px 2px 1px rgba(94, 94, 94, 0.2);
+}
+
+#chart {
+    max-width: 100%;
+    height: auto;
+    height: intrinsic;
+}
+
+.tick text {
+    font-size: 1.2em;
+}
+
+#info {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+}
+
+.info-item {
+    position: relative;
+    list-style: none;
+    margin: 1em 2em;
+}
+
+.rect {
+    position: absolute;
+    top: 0;
+    left: -25px;
+    width: 20px;
+    height: 20px;
 }
