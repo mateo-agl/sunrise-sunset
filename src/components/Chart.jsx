@@ -2,14 +2,15 @@ import axios from "axios";
 import { useRef, useEffect } from "react";
 import { buildAxes } from "../d3";
 
-const colors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFE985", "#FFF0AD", "#F77F00"];
-const itemsArr = ["Night","Astronomical Twilight","Nautical Twilight","Civil Twilight","Daylight","Solar Noon", "Midnight"];
+const colors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFE985", "#FFF0AD", "#F77F00", "#6B00FF"];
+const itemsArr = ["Night","Astronomical Twilight","Nautical Twilight","Civil Twilight","Daylight", "Golden Hour","Solar Noon", "Midnight"];
 const timesArr = [
   [["00:00", "nightEnd"], ["night", "00:00"]],
   [["nightEnd", "nauticalDawn"], ["nauticalDusk", "night"]],
   [["nauticalDawn", "dawn"], ["dusk", "nauticalDusk"]],
   [["dawn", "sunriseEnd"], ["sunsetStart", "dusk"]],
   [["sunriseEnd", "sunsetStart"]],
+  [["goldenHourEnd", "goldenHour"]],
   ["solarNoon"],
   ["nadir"]
 ];
@@ -26,7 +27,7 @@ export const Chart = ({fullName, info, getLocation}) => {
     }, []);
 
     const currentYear = new Date().getFullYear();
-    const title = fullName ? `${fullName} - ${currentYear}` : "Loading...";
+    const title = fullName ? `${fullName} - ${currentYear}` : "Waiting...";
     const list = info ? itemsArr.map((d, i) => {
       const itemTime = [];
       const rect = <span className="rect" style={{background: colors[i]}}/>
@@ -40,7 +41,7 @@ export const Chart = ({fullName, info, getLocation}) => {
           for(let u = 0; u < time.length; u++) {
             const date = info[time[u]];
             if(date == "Invalid Date") {
-              itemTime.push("-")
+              itemTime.push("-");
               return li;
             }
             if(!date) {t.push(time[u])} else {t.push(date.toTimeString().slice(0,5))};

@@ -16,16 +16,17 @@ body {
     width: fit-content;
     height: fit-content;
     position: relative;
+    margin-bottom: 1em;
 }
 
 .search-btn {
     position: absolute;
     right: 0;
-    top: 50;
+    top: 15%;
     background: none;
     border: none;
-    height: 36px;
-    width: 36px;
+    height: 3em;
+    width: 3em;
     cursor: pointer;
 }
 
@@ -36,11 +37,11 @@ body {
 
 .city-name {
     height: 30px;
-    padding-right: 36px;
-    padding-left: 1em;
+    padding: .5em 38px .5em 1em;
     border: 2px gray solid;
     border-radius: 50px;
     transition: .2s;
+    font-size: 1.2em;
 }
 
 .city-name:focus {
@@ -75,7 +76,6 @@ body {
 
 #chart-cont {
     display: flexbox;
-    height: 624px;
     margin: 0 auto;
     background: white;
     box-shadow: 6px 6px 2px 1px rgba(94, 94, 94, 0.2);
@@ -92,22 +92,24 @@ body {
 }
 
 #info {
-    display: flex;
-    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 2em;
     margin: 0;
+    padding: 2em;
     justify-content: center;
 }
 
 .info-item {
+    display: inline-block;
     position: relative;
     list-style: none;
-    margin: 1em 2em;
 }
 
 .rect {
     position: absolute;
     top: 0;
-    left: -25px;
+    left: -1.8em;
     width: 20px;
     height: 20px;
 }
