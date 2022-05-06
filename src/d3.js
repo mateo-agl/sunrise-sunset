@@ -11,7 +11,7 @@ daysInYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0) ? 366 :
 tickValues = [0, 3, 6, 9, 12, 15, 18, 21],
 thresholds = [-90, -18, -12, -6, 0, 6],
 contourColors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFE985", "#FFF0AD"],
-lines = [{name: "solarNoon", color: "#F77F00"}, {name: "nadir", color: "#6B00FF"}],
+lines = [{name: "solarNoon", color: "#F77F00"},{name: "nadir", color: "#9E00FF"}],
 circleColor = "#DD0000",
 monthFormat = d3.timeFormat("%B");
 
@@ -50,13 +50,14 @@ const createContours = (timeZone, lat, lon, thresholds) => {
     return contours;
 };
 
-const createLines = (lat, lon) => {
+const createLines = (timeZone, lat, lon) => {
     const miliInDay = 86400000;
     const data = lines.map((l,i) => {
         let date = new Date(year, 0, i+1);
         const d = [];
         for(let i = 0; i < daysInYear; i++) {
-            d[i] = SunCalc.getTimes(date,lat,lon)[l.name];
+            const val = SunCalc.getTimes(date, lat ,lon)[l.name];
+            d[i] = [new Date(val.toLocaleString("en-US", {timeZone})),l.name];
             date = new Date(date.getTime() + miliInDay);
         };
         return d;
@@ -97,12 +98,8 @@ const buildSunGraph = ({coords}, timeZone) => {
     const {latitude, longitude} = coords;
     const svg = d3.select("#chart");
     const contours = createContours(timeZone, latitude, longitude, thresholds);
-    const linesData = createLines(latitude, longitude);
+    const linesData = createLines(timeZone, latitude, longitude);
     
-    const line = d3.line()
-        .x(d => x(d))
-        .y(d => y(d.getHours() + d.getMinutes() / 60));
-        
     const projection = d3.geoTransform({
         point: function(x, y) {
             const xx = (y * ((w - p.horizontal * 2) / daysInYear)) + p.horizontal;
@@ -111,13 +108,30 @@ const buildSunGraph = ({coords}, timeZone) => {
         }
     });
 
+    const line = d3.line()
+        .defined((d, i) => {
+            if(d[1] === "solarNoon") return true;
+            const s = linesData[1][i+1];
+            if(s) {
+                const q = d[0].getHours();
+                const w = s[0].getHours();
+                if(q < 12 && w > 12) {
+                    return false
+                } else if(q > 12 && w < 12) {
+                    return false
+                }
+                return true;
+            }
+        })
+        .x(d => x(d[0]))
+        .y(d => y(d[0].getHours() + d[0].getMinutes() / 60));
+
     svg.append("g")
         .attr("id", "sun-graph")
         .selectAll("path")
         .data(contours)
         .enter()
         .append("path")
-        .attr("id", d => "g-" + d.value)
         .attr("d", d3.geoPath(projection))
         .style("fill", (d, i) => contourColors[i]);
     
@@ -126,7 +140,7 @@ const buildSunGraph = ({coords}, timeZone) => {
         .data(linesData)
         .enter()
         .append("path")
-        .attr("d", (d, i) => line(linesData[i]))
+        .attr("d", d => line(d))
         .attr("stroke", (d, i) => lines[i].color)
         .attr("fill", "none");
 
@@ -142,4 +156,4 @@ const buildSunGraph = ({coords}, timeZone) => {
         .attr("fill", circleColor);
 };
 
-export { buildAxes, buildSunGraph };
+export { buildAxes, buildSunGraph, getTimeZonesOffset };

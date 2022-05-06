@@ -7,7 +7,15 @@ import SunCalc from "suncalc";
 import "./app.css";
 
 export const App = () => {
-  const [city, setCity] = useState({ fullName: "", cityName: "", matches: [], info: false });
+  const [city, setCity] = useState(
+    {
+      fullName: "",
+      cityName: "",
+      matches: [],
+      times: false,
+      timeZone: ""
+    }
+  );
 
   const getMatches = () => {
     if (!city.cityName) return;
@@ -24,9 +32,9 @@ export const App = () => {
       .then(res => {
         const position = { coords: res.data.location.latlon };
         const timeZone = res.data._links["city:timezone"].name;
-        const date = new Date().toLocaleString("en-US", {timeZone});
-        const info = SunCalc.getTimes(
-          new Date(date),
+        const today = new Date().toLocaleString("en-US", {timeZone});
+        const times = SunCalc.getTimes(
+          new Date(today),
           position.coords.latitude,
           position.coords.longitude
         );
@@ -35,7 +43,8 @@ export const App = () => {
           ...city,
           fullName: res.data.full_name,
           matches: [],
-          info: info
+          times: times,
+          timeZone: timeZone
         });
       })
       .catch(e => console.error(e))
@@ -52,8 +61,9 @@ export const App = () => {
       />
       <Chart
         fullName={city.fullName}
-        info={city.info}
+        times={city.times}
         getLocation={getLocation}
+        timeZone={city.timeZone}
       />
     </main>
   )
