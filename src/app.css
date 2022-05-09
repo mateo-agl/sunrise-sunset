@@ -113,3 +113,20 @@ body {
     width: 20px;
     height: 20px;
 }
+
+circle:hover {
+    cursor: pointer;
+}
+
+#tooltip {
+    position: absolute;
+    text-align: center;
+    color: white;
+    height: auto;					
+    padding: 10px;
+    border: 0px;
+    border-radius: 3px;
+    background: black;
+    pointer-events: none;
+    opacity: 0;
+}

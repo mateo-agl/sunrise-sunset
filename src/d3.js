@@ -52,8 +52,8 @@ const createContours = (timeZone, lat, lon, thresholds) => {
 
 const createLines = (timeZone, lat, lon) => {
     const miliInDay = 86400000;
-    const data = lines.map((l,i) => {
-        let date = new Date(year, 0, i+1);
+    const data = lines.map(l => {
+        let date = new Date(year, 0);
         const d = [];
         for(let i = 0; i < daysInYear; i++) {
             const val = SunCalc.getTimes(date, lat ,lon)[l.name];
@@ -99,6 +99,7 @@ const buildSunGraph = ({coords}, timeZone) => {
     const svg = d3.select("#chart");
     const contours = createContours(timeZone, latitude, longitude, thresholds);
     const linesData = createLines(timeZone, latitude, longitude);
+    const currentDate = new Date(new Date().toLocaleString("en-US", {timeZone}));
     
     const projection = d3.geoTransform({
         point: function(x, y) {
@@ -111,49 +112,61 @@ const buildSunGraph = ({coords}, timeZone) => {
     const line = d3.line()
         .defined((d, i) => {
             if(d[1] === "solarNoon") return true;
-            const s = linesData[1][i+1];
-            if(s) {
-                const q = d[0].getHours();
-                const w = s[0].getHours();
-                if(q < 12 && w > 12) {
-                    return false
-                } else if(q > 12 && w < 12) {
-                    return false
-                }
+            const midnight = linesData[1][i+1];
+            if(midnight) {
+                const q = d[0].getHours() + d[0].getMinutes() / 60;
+                const w = midnight[0].getHours() + midnight[0].getMinutes() / 60;
+                const val = q - w;
+                if(val >= 23 || val <= -23) return false;
                 return true;
             }
         })
-        .x(d => x(d[0]))
+        .x((d, i) => x(new Date(year,0,i+1)))
         .y(d => y(d[0].getHours() + d[0].getMinutes() / 60));
-
-    svg.append("g")
+    
+    const sunGraph = svg.append("g")
         .attr("id", "sun-graph")
-        .selectAll("path")
+
+    const tooltip = d3.select('body')
+        .append("div")
+        .attr('id', 'tooltip');
+
+    sunGraph.selectAll("path")
         .data(contours)
         .enter()
         .append("path")
         .attr("d", d3.geoPath(projection))
         .style("fill", (d, i) => contourColors[i]);
-    
-    svg.append("g")
-        .selectAll("path")
+
+    sunGraph.selectAll("g")
         .data(linesData)
         .enter()
         .append("path")
-        .attr("d", d => line(d))
+        .attr("d", line)
         .attr("stroke", (d, i) => lines[i].color)
+        .attr("stroke-width", 3)
         .attr("fill", "none");
 
-    svg.append("circle")
-        .attr("cx", x(new Date()))
-        .attr("cy", () => {
-            const today = new Date();
-            const miliInHour = 3600000;
-            const offset = getTimeZonesOffset(timeZone) / miliInHour;
-            return y((today.getHours() + today.getMinutes() / 60) - offset);
+    sunGraph.append("circle")
+        .attr("cx", x(currentDate))
+        .attr("cy", () => y(currentDate.getHours() + currentDate.getMinutes() / 60))
+        .attr("r", "6px")
+        .attr("fill", circleColor)
+        .on("mouseover", e => {
+            const left = e.pageX;
+            const top = e.pageY;
+            tooltip.transition()
+                .duration(100)
+                .style('opacity', .8);
+            tooltip.html(currentDate.toLocaleString())
+                .style('left', (left + 15) + 'px')		
+                .style('top', (top - 15) + 'px');
         })
-        .attr("r", "4px")
-        .attr("fill", circleColor);
+        .on('mouseout', () => {
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0)
+        })
 };
 
 export { buildAxes, buildSunGraph, getTimeZonesOffset };
