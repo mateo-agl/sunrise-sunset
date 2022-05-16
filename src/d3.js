@@ -6,7 +6,6 @@ w = 1400,
 p = { vertical: 25, horizontal: 50 },
 year = new Date().getFullYear(),
 hoursInDay = 24,
-minutesInDay = 1440,
 daysInYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0) ? 366 : 365,
 tickValues = [0, 3, 6, 9, 12, 15, 18, 21],
 thresholds = [-90, -18, -12, -6, 0, 6],
@@ -23,28 +22,26 @@ const y = d3.scaleLinear()
     .domain([0, hoursInDay])
     .range([p.vertical, h - p.vertical]);
 
-const getTimeZonesOffset = timeZone => {
-    const localDate = new Date();
-    const miliInHour = 3600000;
-    const tzDate = new Date(localDate.toLocaleString('en-US', {timeZone}));
-    const val = (localDate.getHours() + localDate.getMinutes() / 60) - (tzDate.getHours() + tzDate.getMinutes() / 60);
-    return val.toFixed() * miliInHour;
+const getTimeZoneTimes = (timeZone, i) => {
+    const localDate = new Date(year,0,1,i).getTime();
+    const tzDate = new Date(new Date(year,0,1,i).toLocaleString("en-US", {timeZone})).getTime();
+    return (localDate - tzDate) + localDate;
 }
 
-const createContours = (timeZone, lat, lon, thresholds) => {
-    let date = new Date(year,0,1);
-    const miliInMinute = 60000;
-    const offset = getTimeZonesOffset(timeZone);
+const toLocalTime = (val, timeZone) => {
+    const date = new Date(val.toLocaleString("en-US", {timeZone}));
+    return date.getHours() + date.getMinutes() / 60;
+}
+
+const createContours = (timeZone, lat, lon) => {
     const data = [];
     
-    for(let i = 0; i < (daysInYear * minutesInDay); i++) {
-        const val = date.getTime() + offset;
-        data[i] = SunCalc.getPosition(val, lat, lon).altitude * (180/Math.PI);
-        date = new Date(date.getTime() + miliInMinute);
+    for(let i = 0; i < daysInYear * hoursInDay; i++) {
+        data[i] = SunCalc.getPosition(getTimeZoneTimes(timeZone, i), lat, lon).altitude * (180/Math.PI);
     };
     
     const contours = d3.contours()
-      .size([minutesInDay, daysInYear])
+      .size([hoursInDay, daysInYear])
       .thresholds(thresholds)(data);
     
     return contours;
@@ -57,7 +54,7 @@ const createLines = (timeZone, lat, lon) => {
         const d = [];
         for(let i = 0; i < daysInYear; i++) {
             const val = SunCalc.getTimes(date, lat ,lon)[l.name];
-            d[i] = [new Date(val.toLocaleString("en-US", {timeZone})),l.name];
+            d[i] = [toLocalTime(val, timeZone), l.name];
             date = new Date(date.getTime() + miliInDay);
         };
         return d;
@@ -97,32 +94,30 @@ const buildSunGraph = ({coords}, timeZone) => {
     if(graph) graph.remove();
     const {latitude, longitude} = coords;
     const svg = d3.select("#chart");
-    const contours = createContours(timeZone, latitude, longitude, thresholds);
+    const contours = createContours(timeZone, latitude, longitude);
     const linesData = createLines(timeZone, latitude, longitude);
     const currentDate = new Date(new Date().toLocaleString("en-US", {timeZone}));
     
     const projection = d3.geoTransform({
         point: function(x, y) {
-            const xx = (y * ((w - p.horizontal * 2) / daysInYear)) + p.horizontal;
-            const yy = (x * ((h - p.vertical * 2) / minutesInDay)) + p.vertical;
+            const xx = (y * ((w - p.horizontal * 2) / daysInYear) + p.horizontal);
+            const yy = (x * ((h - p.vertical * 2) / hoursInDay) + p.vertical);
             this.stream.point(xx, yy);
         }
     });
-
+    
     const line = d3.line()
         .defined((d, i) => {
             if(d[1] === "solarNoon") return true;
             const midnight = linesData[1][i+1];
             if(midnight) {
-                const q = d[0].getHours() + d[0].getMinutes() / 60;
-                const w = midnight[0].getHours() + midnight[0].getMinutes() / 60;
-                const val = q - w;
+                const val = d[0] - midnight[0];
                 if(val >= 23 || val <= -23) return false;
                 return true;
-            }
+            } else { return true }
         })
         .x((d, i) => x(new Date(year,0,i+1)))
-        .y(d => y(d[0].getHours() + d[0].getMinutes() / 60));
+        .y(d => y(d[0]));
     
     const sunGraph = svg.append("g")
         .attr("id", "sun-graph")
@@ -137,7 +132,7 @@ const buildSunGraph = ({coords}, timeZone) => {
         .append("path")
         .attr("d", d3.geoPath(projection))
         .style("fill", (d, i) => contourColors[i]);
-
+    
     sunGraph.selectAll("g")
         .data(linesData)
         .enter()
@@ -149,7 +144,7 @@ const buildSunGraph = ({coords}, timeZone) => {
 
     sunGraph.append("circle")
         .attr("cx", x(currentDate))
-        .attr("cy", () => y(currentDate.getHours() + currentDate.getMinutes() / 60))
+        .attr("cy", y(currentDate.getHours() + currentDate.getMinutes() / 60))
         .attr("r", "6px")
         .attr("fill", circleColor)
         .on("mouseover", e => {
@@ -169,4 +164,4 @@ const buildSunGraph = ({coords}, timeZone) => {
         })
 };
 
-export { buildAxes, buildSunGraph, getTimeZonesOffset };
+export { buildAxes, buildSunGraph };
