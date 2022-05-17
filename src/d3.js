@@ -1,11 +1,13 @@
 import * as d3 from "d3";
 import SunCalc from "suncalc";
+import { DateTime } from "luxon";
 
 const h = 450,
 w = 1400,
 p = { vertical: 25, horizontal: 50 },
 year = new Date().getFullYear(),
 hoursInDay = 24,
+quarterHourInDay = 24 * 4,
 daysInYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0) ? 366 : 365,
 tickValues = [0, 3, 6, 9, 12, 15, 18, 21],
 thresholds = [-90, -18, -12, -6, 0, 6],
@@ -22,40 +24,31 @@ const y = d3.scaleLinear()
     .domain([0, hoursInDay])
     .range([p.vertical, h - p.vertical]);
 
-const getTimeZoneTimes = (timeZone, i) => {
-    const localDate = new Date(year,0,1,i).getTime();
-    const tzDate = new Date(new Date(year,0,1,i).toLocaleString("en-US", {timeZone})).getTime();
-    return (localDate - tzDate) + localDate;
-}
-
-const toLocalTime = (val, timeZone) => {
-    const date = new Date(val.toLocaleString("en-US", {timeZone}));
-    return date.getHours() + date.getMinutes() / 60;
-}
-
 const createContours = (timeZone, lat, lon) => {
     const data = [];
     
-    for(let i = 0; i < daysInYear * hoursInDay; i++) {
-        data[i] = SunCalc.getPosition(getTimeZoneTimes(timeZone, i), lat, lon).altitude * (180/Math.PI);
+    for(let i = 0; i < daysInYear * quarterHourInDay; i++) {
+        const local = DateTime.local(year,1,1,0).plus({minutes: i * 15});
+        const rezoned = local.setZone(timeZone);
+        const result = rezoned.ts + ((local.offset * 60000) - (rezoned.offset * 60000));
+        data[i] = SunCalc.getPosition(result, lat, lon).altitude * (180/Math.PI);
     };
     
     const contours = d3.contours()
-      .size([hoursInDay, daysInYear])
+      .size([quarterHourInDay, daysInYear])
       .thresholds(thresholds)(data);
     
     return contours;
 };
 
 const createLines = (timeZone, lat, lon) => {
-    const miliInDay = 86400000;
     const data = lines.map(l => {
-        let date = new Date(year, 0);
         const d = [];
         for(let i = 0; i < daysInYear; i++) {
-            const val = SunCalc.getTimes(date, lat ,lon)[l.name];
-            d[i] = [toLocalTime(val, timeZone), l.name];
-            date = new Date(date.getTime() + miliInDay);
+            const date = DateTime.local(year,1,1).plus({days: i});
+            const nadirNoon = SunCalc.getTimes(date, lat ,lon)[l.name];
+            const rezoned = DateTime.fromJSDate(nadirNoon).setZone(timeZone);
+            d[i] = [rezoned.hour + rezoned.minute / 60, l.name];
         };
         return d;
     });
@@ -96,12 +89,12 @@ const buildSunGraph = ({coords}, timeZone) => {
     const svg = d3.select("#chart");
     const contours = createContours(timeZone, latitude, longitude);
     const linesData = createLines(timeZone, latitude, longitude);
-    const currentDate = new Date(new Date().toLocaleString("en-US", {timeZone}));
+    const currentDate = DateTime.now().setZone(timeZone);
     
     const projection = d3.geoTransform({
         point: function(x, y) {
             const xx = (y * ((w - p.horizontal * 2) / daysInYear) + p.horizontal);
-            const yy = (x * ((h - p.vertical * 2) / hoursInDay) + p.vertical);
+            const yy = (x * ((h - p.vertical * 2) / quarterHourInDay) + p.vertical);
             this.stream.point(xx, yy);
         }
     });
@@ -144,7 +137,7 @@ const buildSunGraph = ({coords}, timeZone) => {
 
     sunGraph.append("circle")
         .attr("cx", x(currentDate))
-        .attr("cy", y(currentDate.getHours() + currentDate.getMinutes() / 60))
+        .attr("cy", y(currentDate.hour + currentDate.minute / 60))
         .attr("r", "6px")
         .attr("fill", circleColor)
         .on("mouseover", e => {
@@ -153,7 +146,7 @@ const buildSunGraph = ({coords}, timeZone) => {
             tooltip.transition()
                 .duration(100)
                 .style('opacity', .8);
-            tooltip.html(currentDate.toLocaleString())
+            tooltip.html(currentDate.toJSDate())
                 .style('left', (left + 15) + 'px')		
                 .style('top', (top - 15) + 'px');
         })

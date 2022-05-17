@@ -1,4 +1,5 @@
 import axios from "axios";
+import { DateTime } from "luxon";
 import { useRef, useEffect } from "react";
 import { buildAxes } from "../d3";
 
@@ -35,8 +36,8 @@ export const Chart = ({fullName, times, getLocation, timeZone}) => {
       for(let o = 0; o < timesArr[i].length; o++) {
         const time = timesArr[i][o];
         if(typeof time === "string") {
-          const d = times[time].toLocaleString("en-US", {timeZone})
-          itemTime.push(new Date(d).toTimeString().slice(0,5));
+          const d = DateTime.fromJSDate(times[time]).setZone(timeZone);
+          itemTime.push(`${d.hour}:${d.minute}`);
         } else {
           const t = [];
           for(let u = 0; u < time.length; u++) {
@@ -48,8 +49,8 @@ export const Chart = ({fullName, times, getLocation, timeZone}) => {
             if(!date) {
               t.push(time[u])
             } else {
-              const d = date.toLocaleString("en-US", {timeZone})
-              t.push(new Date(d).toTimeString().slice(0,5))
+              const d = DateTime.fromJSDate(date).setZone(timeZone);
+              t.push(`${d.hour}:${d.minute}`)
             };
           }
           t.splice(1,0," - ");

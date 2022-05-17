@@ -5,6 +5,7 @@ import { Chart } from "./components/Chart";
 import { buildSunGraph } from "./d3";
 import SunCalc from "suncalc";
 import "./app.css";
+import { DateTime } from "luxon";
 
 export const App = () => {
   const [city, setCity] = useState(
@@ -32,9 +33,8 @@ export const App = () => {
       .then(res => {
         const position = { coords: res.data.location.latlon };
         const timeZone = res.data._links["city:timezone"].name;
-        const today = new Date().toLocaleString("en-US", {timeZone});
         const times = SunCalc.getTimes(
-          new Date(today),
+          DateTime.now(),
           position.coords.latitude,
           position.coords.longitude
         );
