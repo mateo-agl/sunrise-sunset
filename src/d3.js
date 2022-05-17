@@ -146,7 +146,7 @@ const buildSunGraph = ({coords}, timeZone) => {
             tooltip.transition()
                 .duration(100)
                 .style('opacity', .8);
-            tooltip.html(currentDate.toJSDate())
+            tooltip.html(`${currentDate.toLocaleString()} ${currentDate.hour}:${currentDate.minute}`)
                 .style('left', (left + 15) + 'px')		
                 .style('top', (top - 15) + 'px');
         })
