@@ -99,21 +99,22 @@ const buildSunGraph = ({coords}, timeZone) => {
         }
     });
     
-    const line = d3.line()
+    const line = d3.area()
         .defined((d, i) => {
-            if(d[1] === "solarNoon") return true;
-            const midnight = linesData[1][i+1];
-            if(midnight) {
-                const val = d[0] - midnight[0];
-                if(val >= 23 || val <= -23) return false;
-                return true;
-            } else { return true }
+            if(d[1] === "nadir") {
+                const nextDate = linesData[1][i+1];
+                if(nextDate) {
+                    const val = d[0] - nextDate[0];
+                    if(val >= 23 || val <= -23) return false;
+                }
+            }
+            return true;
         })
         .x((d, i) => x(new Date(year,0,i+1)))
         .y(d => y(d[0]));
     
     const sunGraph = svg.append("g")
-        .attr("id", "sun-graph")
+        .attr("id", "sun-graph");
 
     const tooltip = d3.select('body')
         .append("div")
