@@ -18,13 +18,18 @@ const timesArr = [
 
 export const Chart = ({fullName, times, getLocation, timeZone}) => {
     const ref = useRef();
+
+    const buildGraph = ({coords}) => {
+      axios.get(`https://api.teleport.org/api/locations/${coords.latitude},${coords.longitude}/`)
+        .then(res => getLocation(res.data._embedded["location:nearest-cities"][0]._links["location:nearest-city"].href))
+        .catch(err => console.error(err));
+    };
+
+    const handleError = () => alert("This app needs access to your location to display the graph corresponding to your location. You can also search your city or any other to display it.");
     
     useEffect(() => {
       buildAxes(ref.current);
-      navigator.geolocation.getCurrentPosition(({coords}) => {
-        axios.get(`https://api.teleport.org/api/locations/${coords.latitude},${coords.longitude}/`)
-          .then(res => getLocation(res.data._embedded["location:nearest-cities"][0]._links["location:nearest-city"].href))
-      });
+      navigator.geolocation.getCurrentPosition(buildGraph, handleError);
     }, []);
 
     const currentYear = new Date().getFullYear();
@@ -37,7 +42,7 @@ export const Chart = ({fullName, times, getLocation, timeZone}) => {
         const time = timesArr[i][o];
         if(typeof time === "string") {
           const d = DateTime.fromJSDate(times[time]).setZone(timeZone);
-          itemTime.push(`${d.hour}:${d.minute}`);
+          itemTime.push(`${d.toISOTime().slice(0,5)}`);
         } else {
           const t = [];
           for(let u = 0; u < time.length; u++) {
@@ -50,7 +55,7 @@ export const Chart = ({fullName, times, getLocation, timeZone}) => {
               t.push(time[u])
             } else {
               const d = DateTime.fromJSDate(date).setZone(timeZone);
-              t.push(`${d.hour}:${d.minute}`)
+              t.push(`${d.toISOTime().slice(0,5)}`)
             };
           }
           t.splice(1,0," - ");

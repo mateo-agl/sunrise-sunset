@@ -3,7 +3,7 @@ import { ReactComponent as SearchIcon } from "../assets/search.svg";
 export const Search = ({ getMatches, getLocation, handleInput, city }) => {
     const search = () => getMatches();
     const selectCity = city => getLocation(city._links["city:item"].href);
-    window.onkeydown = e => e.key === "Enter" ? search() : null;
+    const handleEnter = e => e.key === "Enter" ? search() : null;
     return (
         <div className="search-cont">
             <input
@@ -11,12 +11,15 @@ export const Search = ({ getMatches, getLocation, handleInput, city }) => {
                 onChange={handleInput}
                 value={city.name}
                 placeholder="City name"
+                onKeyDown={handleEnter}
             />
             <ul className="city-list">
                 {
                     city.matches.map(
                         (c, i) =>
-                            <li
+                            c === "No matches found"
+                            ? <label className="no-city" key={i}>{c}</label>
+                            : <li
                                 className="city"
                                 key={i}
                                 onClick={() => selectCity(c)}
