@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { useRef, useEffect } from "react";
 import { buildAxes } from "../d3";
 
-const colors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFE985", "#FFF0AD", "#F77F00", "#9E00FF"];
+const colors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFF0AD", "#FFE56E", "#F77F00", "#9E00FF"];
 const itemsArr = ["Night","Astronomical Twilight","Nautical Twilight","Civil Twilight","Daylight", "Golden Hour","Solar Noon", "Midnight"];
 const timesArr = [
   [["00:00", "nightEnd"], ["night", "00:00"]],
@@ -11,7 +11,7 @@ const timesArr = [
   [["nauticalDawn", "dawn"], ["dusk", "nauticalDusk"]],
   [["dawn", "sunriseEnd"], ["sunsetStart", "dusk"]],
   [["sunriseEnd", "sunsetStart"]],
-  [["goldenHourEnd", "goldenHour"]],
+  [["sunriseEnd", "goldenHourEnd"], ["goldenHour", "sunsetStart"]],
   ["solarNoon"],
   ["nadir"]
 ];
