@@ -30,6 +30,7 @@ export const App = () => {
   };
 
   const getLocation = url => {
+    setCity({...city, fullName: "Loading..."});
     axios.get(url)
       .then(res => {
         const position = { coords: res.data.location.latlon };
@@ -42,7 +43,7 @@ export const App = () => {
         buildSunGraph(position, timeZone);
         setCity({
           ...city,
-          fullName: res.data.full_name,
+          fullName: `${res.data.full_name} - ${DateTime.now().year}`,
           matches: [],
           times: times,
           timeZone: timeZone
@@ -52,6 +53,8 @@ export const App = () => {
   };
 
   const handleInput = e => setCity({ ...city, cityName: e.target.value });
+
+  const handleError = () => setCity({...city, fullName: "Couldn't get your location. Please search a city."});
 
   window.onclick = () => setCity({...city, matches: []});
 
@@ -68,6 +71,7 @@ export const App = () => {
         times={city.times}
         getLocation={getLocation}
         timeZone={city.timeZone}
+        handleError={handleError}
       />
     </main>
   )

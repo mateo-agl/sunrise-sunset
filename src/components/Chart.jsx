@@ -16,60 +16,56 @@ const timesArr = [
   ["nadir"]
 ];
 
-export const Chart = ({fullName, times, getLocation, timeZone}) => {
-    const ref = useRef();
+export const Chart = ({fullName, times, getLocation, timeZone, handleError}) => {
+  const ref = useRef();
 
-    const buildGraph = ({coords}) => {
-      axios.get(`https://api.teleport.org/api/locations/${coords.latitude},${coords.longitude}/`)
-        .then(res => getLocation(res.data._embedded["location:nearest-cities"][0]._links["location:nearest-city"].href))
-        .catch(err => console.error(err));
-    };
+  const buildGraph = ({coords}) => {
+    axios.get(`https://api.teleport.org/api/locations/${coords.latitude},${coords.longitude}/`)
+      .then(res => getLocation(res.data._embedded["location:nearest-cities"][0]._links["location:nearest-city"].href))
+      .catch(err => console.error(err));
+  };
+  
+  useEffect(() => {
+    buildAxes(ref.current);
+    navigator.geolocation.getCurrentPosition(buildGraph, handleError);
+  }, []);
 
-    const handleError = () => alert("This app needs access to your location to display the graph corresponding to your location. You can also search your city or any other to display it.");
-    
-    useEffect(() => {
-      buildAxes(ref.current);
-      navigator.geolocation.getCurrentPosition(buildGraph, handleError);
-    }, []);
-
-    const currentYear = new Date().getFullYear();
-    const title = fullName ? `${fullName} - ${currentYear}` : "Waiting...";
-    const list = times && timeZone ? itemsArr.map((d, i) => {
-      const itemTime = [];
-      const rect = <span className="rect" style={{background: colors[i]}}/>
-      const li = <li className="info-item" key={i}>{rect}{d+": "}<div>{itemTime}</div></li>
-      for(let o = 0; o < timesArr[i].length; o++) {
-        const time = timesArr[i][o];
-        if(typeof time === "string") {
-          const d = DateTime.fromJSDate(times[time]).setZone(timeZone);
-          itemTime.push(`${d.toISOTime().slice(0,5)}`);
-        } else {
-          const t = [];
-          for(let u = 0; u < time.length; u++) {
-            const date = times[time[u]];
-            if(date == "Invalid Date") {
-              itemTime.push("-");
-              return li;
-            }
-            if(!date) {
-              t.push(time[u])
-            } else {
-              const d = DateTime.fromJSDate(date).setZone(timeZone);
-              t.push(`${d.toISOTime().slice(0,5)}`)
-            };
+  const list = times && timeZone ? itemsArr.map((d, i) => {
+    const itemTime = [];
+    const rect = <span className="rect" style={{background: colors[i]}}/>
+    const li = <li className="info-item" key={i}>{rect}{d+": "}<div>{itemTime}</div></li>
+    for(let o = 0; o < timesArr[i].length; o++) {
+      const time = timesArr[i][o];
+      if(typeof time === "string") {
+        const d = DateTime.fromJSDate(times[time]).setZone(timeZone);
+        itemTime.push(`${d.toISOTime().slice(0,5)}`);
+      } else {
+        const t = [];
+        for(let u = 0; u < time.length; u++) {
+          const date = times[time[u]];
+          if(date == "Invalid Date") {
+            itemTime.push("-");
+            return li;
           }
-          t.splice(1,0," - ");
-          itemTime.push(<div key={o}>{t}</div>);
+          if(!date) {
+            t.push(time[u])
+          } else {
+            const d = DateTime.fromJSDate(date).setZone(timeZone);
+            t.push(`${d.toISOTime().slice(0,5)}`)
+          };
         }
+        t.splice(1,0," - ");
+        itemTime.push(<div key={o}>{t}</div>);
       }
-      return li;
-    }) : "";
+    }
+    return li;
+  }) : "";
 
-    return (
-      <div id="chart-cont">
-        <h1 id="title">{title}</h1>
-        <svg id="chart" ref={ref}/>
-        <ul id="info">{list}</ul>
-      </div>
-    )
+  return (
+    <div id="chart-cont">
+      <h1 id="title">{fullName}</h1>
+      <svg id="chart" ref={ref}/>
+      <ul id="info">{list}</ul>
+    </div>
+  )
 };
