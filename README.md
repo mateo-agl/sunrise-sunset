@@ -4,6 +4,17 @@ Aplicación hecha con React y D3, sirve para obtener información sobre la luz s
 
 Demo: https://mateo-agl.github.io/sunrise-sunset/
 
+## Instalación
+
+Para iniciar esta app localmente debes tener una base de datos en MongoDB.
+
+Clona el repositorio
+```
+git clone https://github.com/mateo-agl/anonymous-message-board.git
+cd anonymous-message-board
+npm install
+```
+
 ## Scripts
 
 ### npm start
