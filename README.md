@@ -10,8 +10,8 @@ Para iniciar esta app localmente debes tener una base de datos en MongoDB.
 
 Clona el repositorio
 ```
-git clone https://github.com/mateo-agl/anonymous-message-board.git
-cd anonymous-message-board
+git clone https://github.com/mateo-agl/sunrise-sunset.git
+cd sunrise-sunset
 npm install
 ```
 
