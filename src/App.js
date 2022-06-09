@@ -46,7 +46,7 @@ export const App = () => {
       axios.get(`https://api.teleport.org/api/locations/${coords.latitude},${coords.longitude}/`)
         .then(res => getLocation(res.data._embedded["location:nearest-cities"][0]._links["location:nearest-city"].href))
         .catch(err => console.error(err));
-    }, setCity({...city, fullName: "Couldn't get your location. Please search a city."}))
+    }, () => setCity({...city, fullName: "Couldn't get your location. Please search a city."}))
   , []);
 
   const getMatches = () => {
