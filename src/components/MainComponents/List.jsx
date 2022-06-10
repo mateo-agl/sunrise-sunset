@@ -22,12 +22,7 @@ export const List = ({ times, timeZone }) => (
                 <Col as="li" md="3" sm="4" xs="6" key={i}>
                     <Row>
                         <Col sm="auto" xs="1" className="px-0 pt-1">
-                            <span style={{
-                                display: "block",
-                                background: colors[i],
-                                width: "20px",
-                                height: "20px"
-                            }}/>
+                            <span className="rect" style={{background: colors[i]}}/>
                         </Col>
                         <Col className="info">
                             <label>{d+": "}</label><br/>

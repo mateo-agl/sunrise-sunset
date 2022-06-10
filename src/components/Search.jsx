@@ -7,8 +7,8 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { name, mat
     const handleEnter = e => e.key === "Enter" && search();
     return (
         <>
-            <Row sm="auto" className="px-3 mt-2">
-                <Col className="p-0">
+            <Row xs="auto" className="mw-100 mx-1 mt-2">
+                <Col className="d-flex p-0">
                     <Form.Control
                         className="rounded-0 rounded-start"
                         onChange={handleInput}
@@ -16,8 +16,6 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { name, mat
                         placeholder="City name"
                         onKeyDown={handleEnter}
                     />
-                </Col>
-                <Col className="p-0">
                     <Button 
                         className="rounded-0 rounded-end"
                         variant="secondary"
