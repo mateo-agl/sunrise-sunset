@@ -7,6 +7,6 @@ export const Chart = () => {
   useEffect(() => buildAxes(ref.current), []);
 
   return (
-    <svg id="chart" ref={ref}/>
+    <svg id="chart" className="mx-auto" ref={ref}/>
   )
 };

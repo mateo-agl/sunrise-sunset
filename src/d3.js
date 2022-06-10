@@ -2,8 +2,8 @@ import * as d3 from "d3";
 import SunCalc from "suncalc";
 import { DateTime } from "luxon";
 
-const h = 450,
-w = 1400,
+const h = 538,
+w = 1616,
 p = { vertical: 25, horizontal: 50 },
 year = DateTime.now().year,
 hoursInDay = 24,

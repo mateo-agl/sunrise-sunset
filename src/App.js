@@ -2,10 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Search } from "./components/Search";
 import SunCalc from "suncalc";
-import "./app.css";
 import { DateTime } from "luxon";
 import { buildSunGraph } from "./d3";
 import { Main } from "./components/Main";
+import "./app.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container } from "react-bootstrap";
 
 export const App = () => {
   const [city, setCity] = useState(
@@ -50,11 +52,11 @@ export const App = () => {
   , []);
 
   const getMatches = () => {
-    if (!city.cityName) return;
+    city.cityName &&
     axios.get(`https://api.teleport.org/api/cities/?search=${city.cityName}&limit=5`)
       .then(res => {
         const matches = res.data._embedded["city:search-results"];
-        if (matches.length === 0) matches.push("No matches found");
+        matches.length === 0 && matches.push("No matches found");
         setCity({ ...city, matches: matches });
       })
       .catch(e => console.error(e));
@@ -65,7 +67,7 @@ export const App = () => {
   window.onclick = () => setCity({...city, matches: []});
 
   return (
-    <main className="container">
+    <Container as="main" fluid>
       <Search
         getMatches={getMatches}
         getLocation={getLocation}
@@ -73,6 +75,6 @@ export const App = () => {
         city={city}
       />
       <Main city={city}/>
-    </main>
+    </Container>
   )
 };
