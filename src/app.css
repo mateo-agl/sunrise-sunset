@@ -30,6 +30,7 @@ body {
     pointer-events: none;
     opacity: 0;
 }
+
 .list-group {
     z-index: 1;
 }
@@ -42,6 +43,10 @@ body {
     display: block;
     width: 20px;
     height: 20px;
+}
+
+.card {
+    width: fit-content !important;
 }
 
 @media (max-width: 846px) {

@@ -7,7 +7,7 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { name, mat
     const handleEnter = e => e.key === "Enter" && search();
     return (
         <>
-            <Row xs="auto" className="mw-100 mx-1 mt-2">
+            <Row xs="auto" className="mx-1 mt-2">
                 <Col className="d-flex p-0">
                     <Form.Control
                         className="rounded-0 rounded-start"

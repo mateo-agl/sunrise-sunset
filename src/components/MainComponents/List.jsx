@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { Col, Row } from "react-bootstrap";
 const colors = ["#001D3D", "#014E8E", "#6798C0", "#99D6EA", "#FFF0AD", "#FFE56E", "#F77F00", "#9E00FF"];
-const itemsArr = ["Night","Astronomical Twilight","Nautical Twilight","Civil Twilight","Daylight", "Golden Hour","Solar Noon", "Midnight"];
+const itemsArr = ["Night","Astronomical Twilight","Nautical Twilight","Civil Twilight","Day", "Golden Hour","Solar Noon", "Midnight"];
 const timesArr = [
   [["00:00", "nightEnd"], ["night", "00:00"]],
   [["nightEnd", "nauticalDawn"], ["nauticalDusk", "night"]],
