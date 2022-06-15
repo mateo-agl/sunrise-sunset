@@ -52,6 +52,7 @@ ul, input {
 }
 
 .rect {
+    display: block;
     width: clamp(.6rem, 3.5vw, 1.2rem) !important;
     height: clamp(.6rem, 3.5vw, 1.2rem) !important;
 }
