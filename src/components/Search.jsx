@@ -1,7 +1,7 @@
 import { ReactComponent as SearchBtn } from "../assets/search.svg";
 import { Form, Button, ListGroup, Col, Row } from 'react-bootstrap';
 
-export const Search = ({ getMatches, getLocation, handleInput, city: { name, matches } }) => {
+export const Search = ({ getMatches, getLocation, handleInput, city: { name, matches }, reset }) => {
     const search = () => getMatches();
     const selectCity = city => getLocation(city._links["city:item"].href);
     const handleEnter = e => e.key === "Enter" && search();
@@ -15,6 +15,7 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { name, mat
                         value={name}
                         placeholder="City name"
                         onKeyDown={handleEnter}
+                        onBlur={reset}
                     />
                     <Button 
                         className="rounded-0 rounded-end"

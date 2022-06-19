@@ -31,7 +31,7 @@ export const App = () => {
 
   const handleInput = e => setCity({ ...city, cityName: e.target.value });
 
-  window.onclick = () => setCity({...city, matches: []});
+  const reset = () => setCity({...city, matches: []});
 
   const getLocation = url => {
     setCity({...city, fullName: "Loading..."});
@@ -71,6 +71,7 @@ export const App = () => {
         getLocation={getLocation}
         handleInput={handleInput}
         city={city}
+        reset={reset}
       />
       <Main city={city}/>
     </Container>
