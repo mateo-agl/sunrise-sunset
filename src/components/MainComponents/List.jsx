@@ -16,7 +16,7 @@ const timesArr = [
 export const List = ({ times, timeZone }) => (
   <Row as="ul" className="gy-3 my-2 p-0 mx-auto">
     {
-        times && timeZone && itemsArr.map((d, i) => {
+        itemsArr.map((d, i) => {
             const itemTime = [];
             const li = (
                 <Col as="li" md="3" sm="4" xs="6" key={i}>
@@ -32,25 +32,29 @@ export const List = ({ times, timeZone }) => (
                 </Col>
             );
             for(let o = 0; o < timesArr[i].length; o++) {
-                const time = timesArr[i][o];
-                if(typeof time === "string") {
-                    itemTime.push(`${DateTime.fromJSDate(times[time]).setZone(timeZone).toISOTime().slice(0,5)}`);
+                if (!times && !timeZone) {
+                    itemTime.push("-");
                 } else {
-                    const t = [];
-                    for(let u = 0; u < time.length; u++) {
-                        const date = times[time[u]];
-                        if(date instanceof Date && isNaN(date)) {
-                            itemTime.push("-");
-                            return li;
-                        }
-                        if(!date) {
-                            t.push(time[u])
-                        } else {
-                            t.push(`${DateTime.fromJSDate(date).setZone(timeZone).toISOTime().slice(0,5)}`)
+                    const time = timesArr[i][o];
+                    if(typeof time === "string") {
+                        itemTime.push(`${DateTime.fromJSDate(times[time]).setZone(timeZone).toISOTime().slice(0,5)}`);
+                    } else {
+                        const t = [];
+                        for(let u = 0; u < time.length; u++) {
+                            const date = times[time[u]];
+                            if(date instanceof Date && isNaN(date)) {
+                                itemTime.push("-");
+                                return li;
+                            }
+                            if(!date) {
+                                t.push(time[u])
+                            } else {
+                                t.push(`${DateTime.fromJSDate(date).setZone(timeZone).toISOTime().slice(0,5)}`)
+                            };
                         };
-                    };
-                    t.splice(1,0," - ");
-                    itemTime.push(<div key={o}>{t}</div>);
+                        t.splice(1,0," - ");
+                        itemTime.push(<div key={o}>{t}</div>);
+                    }
                 }
             }
             return li;

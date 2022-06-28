@@ -1,32 +1,25 @@
 import { ReactComponent as SearchBtn } from "../assets/search.svg";
 import { Form, Button, ListGroup, Col, Row } from 'react-bootstrap';
 
-export const Search = ({ getMatches, getLocation, handleInput, city: { name, matches }, reset }) => {
-    const search = () => getMatches();
-    const selectCity = city => getLocation(city._links["city:item"].href);
-    const handleEnter = e => e.key === "Enter" && search();
-    return (
-        <>
-            <Row xs="auto" className="mx-1 mt-2">
-                <Col className="d-flex p-0">
-                    <Form.Control
-                        className="rounded-0 rounded-start"
-                        onChange={handleInput}
-                        value={name}
-                        placeholder="City name"
-                        onKeyDown={handleEnter}
-                        onBlur={reset}
-                    />
-                    <Button 
-                        className="rounded-0 rounded-end"
-                        variant="secondary"
-                        onClick={search}
-                    >
-                        <SearchBtn/>
-                    </Button>
-                </Col>
-            </Row>
-            <ListGroup as="ul" className="position-absolute">
+export const Search = ({ getMatches, getLocation, handleInput, city: { cityName, matches }, reset }) => (
+    <Row xs="auto" className="mx-1 mt-2">
+        <Col className="d-flex p-0 position-relative">
+            <Form.Control
+                className="rounded-0 rounded-start"
+                onChange={handleInput}
+                value={cityName}
+                placeholder="City name"
+                onBlur={e => !e.relatedTarget && reset()}
+                onKeyDown={e => e.key === "Enter" && getMatches()}
+            />
+            <Button 
+                className="rounded-0 rounded-end"
+                variant="secondary"
+                onClick={getMatches}
+            >
+                <SearchBtn/>
+            </Button>
+            <ListGroup as="ul" className="position-absolute top-100 w-100" tabIndex="-1">
                 {
                     matches.map((c, i) => (
                         c === "No matches found"
@@ -36,13 +29,13 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { name, mat
                             : <ListGroup.Item
                                 as="li"
                                 key={i}
-                                onClick={() => selectCity(c)}
+                                onClick={() => getLocation(c)}
                             >
-                                <label>{c.matching_full_name}</label>
+                                <label>{`${c.name}, ${c.countryName}`}</label>
                             </ListGroup.Item>
                     ))
                 }
             </ListGroup>
-        </>
-    )
-};
+        </Col>
+    </Row>
+);
