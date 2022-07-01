@@ -19,7 +19,7 @@ npm install
 Para iniciar el servidor de desarrollo en http://localhost:3000.
 
 ### npm run start
-Para iniciar el servidor
+Para iniciar el servidor.
 
 ### npm run build
 Arma el bundle de la app, que se puede iniciar declarando dentro de un archivo .env `NODE_ENV=production`.
