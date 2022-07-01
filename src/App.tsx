@@ -6,84 +6,91 @@ import { DateTime } from "luxon";
 import { buildSunGraph } from "./d3";
 import { Main } from "./components/Main";
 import { Container } from "react-bootstrap";
+import { ICity } from "country-state-city/dist/lib/interface.js";
 import "./app.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-interface State {
+interface AppState {
   fullName: string,
-  cityName: string,
-  matches: Array<string>,
+  matches: Array<ICity | string>,
   times: boolean | Object,
-  timeZone: string
+  timeZone: string,
+  allCities: Array<ICity>
 }
 
 interface LocationObj {
+  countryName?: string,
   name: string,
-  lat: number,
-  lng: number
+  timeZone?: string,
+  latitude: number,
+  longitude: number
 }
 
 export const App = () => {
-  const [city, setCity] = useState<State>({
+  const [city, setCity] = useState<AppState>({
       fullName: "",
-      cityName: "",
       matches: [],
       times: false,
-      timeZone: ""
+      timeZone: "",
+      allCities: []
   });
+  const hostName = process.env.NODE_ENV === "development" 
+    ? "http://localhost:8080" : "";
 
-  const getMatches = () => {
-    const url = `http://api.geonames.org/searchJSON?q=${city.cityName}&maxRows=5&username=sunrise_sunset`;
-    axios.get(url)
-      .then(res => {
-        const matches = res.data.geonames;
-        matches.length === 0 && matches.push("No matches found");
-        setCity({ ...city, matches: matches });
-      })
-      .catch(e => console.error(e));
+  const getMatches = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    axios.get(`${hostName}/match_cities?name=${name}`)
+      .then(res => setCity({ ...city, matches: res.data}))
+      .catch(err => console.error(err));
   };
   
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => setCity({ ...city, cityName: e.target.value });
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => getMatches(e);
 
   const reset = () => setCity({...city, matches: []});
 
-  const getLocation = (obj: LocationObj) => {
-    const position = { coords: { latitude: obj.lat, longitude: obj.lng } };
+  const getLocation = async (obj: LocationObj) => {
+    const url = `${hostName}/city?${!obj.timeZone ? `lat=${obj.latitude}&lon=${obj.longitude}` : ""}&name=${obj.name}`;
+    const { data } = await axios.get(url);
+    const timeZone: string = obj.timeZone ? obj.timeZone : data.timeZone;
+    const position = { coords: { latitude: obj.latitude, longitude: obj.longitude } };
 
-    const url = `http://api.geonames.org/timezoneJSON?lat=${obj.lat}&lng=${obj.lng}&username=sunrise_sunset`
-    axios.get(url)
-      .then(res => {
-        const timeZone = res.data.timezoneId;
-        buildSunGraph(position, timeZone);
-        setCity({
-          ...city,
-          fullName: `${obj.name}, ${res.data.countryName} - ${DateTime.now().year}`,
-          matches: [],
-          times: SunCalc.getTimes(DateTime.now(), obj.lat, obj.lng),
-          timeZone: timeZone
-        })
-      })
-      .catch(e => console.error(e))
+    buildSunGraph(position, timeZone);
+
+    setCity({
+      ...city,
+      fullName: `${obj.name}, ${data.countryName} - ${DateTime.now().year}`,
+      matches: [],
+      times: SunCalc.getTimes(DateTime.now(), obj.latitude, obj.longitude),
+      timeZone: timeZone
+    });
   };
   
   useEffect(() => {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const name = timeZone.split("/")[1].replace("_", " ");
     let latLon: any = localStorage.getItem("location");
     
     if(latLon) {
       latLon = JSON.parse(latLon);
-      getLocation({ ...latLon, name: name });
+      getLocation({ ...latLon });
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      ({coords}) => {
-        const latLon = { lat: coords.latitude, lng: coords.longitude };
+      async ({coords}) => {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const name = timeZone.split("/")[1].replace("_", " ");
+        const latLon = { 
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          name: name,
+          timeZone: timeZone
+        };
         localStorage.setItem("location", JSON.stringify(latLon));
-        getLocation({ ...latLon, name: name });
+        getLocation({ ...latLon });
       },
-      () => setCity(c => ({...c, fullName: "Couldn't get your location. Please search a city."}))
+      () => setCity(c => ({
+          ...c,
+          fullName: "Couldn't get your location. Please search a city."
+      }))
     );
   }, []);
 

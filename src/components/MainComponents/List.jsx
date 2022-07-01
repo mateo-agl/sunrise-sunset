@@ -31,14 +31,13 @@ export const List = ({ times, timeZone }) => (
                     </Row>
                 </Col>
             );
-            for(let o = 0; o < timesArr[i].length; o++) {
-                if (!times && !timeZone) {
-                    itemTime.push("-");
-                } else {
+            for(let o = 0; o < timesArr[i].length; o++)
+                if (!times && !timeZone) itemTime.push("-");
+                else {
                     const time = timesArr[i][o];
-                    if(typeof time === "string") {
+                    if(typeof time === "string") 
                         itemTime.push(`${DateTime.fromJSDate(times[time]).setZone(timeZone).toISOTime().slice(0,5)}`);
-                    } else {
+                    else {
                         const t = [];
                         for(let u = 0; u < time.length; u++) {
                             const date = times[time[u]];
@@ -46,17 +45,13 @@ export const List = ({ times, timeZone }) => (
                                 itemTime.push("-");
                                 return li;
                             }
-                            if(!date) {
-                                t.push(time[u])
-                            } else {
-                                t.push(`${DateTime.fromJSDate(date).setZone(timeZone).toISOTime().slice(0,5)}`)
-                            };
+                            if(!date) t.push(time[u])
+                            else t.push(`${DateTime.fromJSDate(date).setZone(timeZone).toISOTime().slice(0,5)}`);
                         };
                         t.splice(1,0," - ");
                         itemTime.push(<div key={o}>{t}</div>);
                     }
                 }
-            }
             return li;
         })
     }

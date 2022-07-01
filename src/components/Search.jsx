@@ -1,13 +1,12 @@
 import { ReactComponent as SearchBtn } from "../assets/search.svg";
 import { Form, Button, ListGroup, Col, Row } from 'react-bootstrap';
 
-export const Search = ({ getMatches, getLocation, handleInput, city: { cityName, matches }, reset }) => (
+export const Search = ({ getMatches, getLocation, handleInput, city: { matches }, reset }) => (
     <Row xs="auto" className="mx-1 mt-2">
         <Col className="d-flex p-0 position-relative">
             <Form.Control
                 className="rounded-0 rounded-start"
                 onChange={handleInput}
-                value={cityName}
                 placeholder="City name"
                 onBlur={e => !e.relatedTarget && reset()}
                 onKeyDown={e => e.key === "Enter" && getMatches()}
@@ -31,7 +30,7 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { cityName,
                                 key={i}
                                 onClick={() => getLocation(c)}
                             >
-                                <label>{`${c.name}, ${c.countryName}`}</label>
+                                <label>{`${c.name}, ${c.countryCode}`}</label>
                             </ListGroup.Item>
                     ))
                 }
