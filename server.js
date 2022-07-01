@@ -8,7 +8,7 @@ const { find } = require('geo-tz');
 if(process.env.NODE_ENV === "production") {
     app.use(express.static("build"));
 } else {
-    app.use((req, res, next) => {
+    app.use((_, res, next) => {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
