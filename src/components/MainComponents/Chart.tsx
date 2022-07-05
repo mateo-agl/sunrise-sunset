@@ -1,3 +1,4 @@
+import React from "react";
 import { useRef, useEffect } from "react";
 import { buildAxes } from "../../d3";
 

@@ -27,7 +27,7 @@ const y = d3.scaleLinear()
     .domain([0, hoursInDay])
     .range([p.vertical, h - p.vertical]);
 
-const createContours = (timeZone, lat, lon) => {
+const createContours = (timeZone: string, lat: number, lon: number) => {
     const data = [];
     
     for(let i = 0; i < daysInYear * quarterHourInDay; i++) {
@@ -45,14 +45,14 @@ const createContours = (timeZone, lat, lon) => {
 };
 
 const projection = d3.geoTransform({
-    point: function(x, y) {
+    point: function(x: number, y: number) {
         const xx = (y * ((w - p.horizontal * 2) / daysInYear) + p.horizontal);
         const yy = (x * ((h - p.vertical * 2) / quarterHourInDay) + p.vertical);
         this.stream.point(xx, yy);
     }
 });
 
-const createLines = (timeZone, lat, lon) => {
+const createLines = (timeZone: string, lat: number, lon: number) => {
     const data = lineColors.map(l => {
         const d = [];
         for(let i = 0; i < daysInYear; i++) {
@@ -67,7 +67,7 @@ const createLines = (timeZone, lat, lon) => {
     return data;
 };
 
-const buildAxes = chart => {
+const buildAxes = (chart: SVGAElement) => {
     const svg = d3.select(chart)
         .attr("height", h)
         .attr("width", w)
@@ -93,7 +93,7 @@ const buildAxes = chart => {
         .call(yAxis);
 };
 
-const buildSunGraph = ({coords}, timeZone) => {
+const buildSunGraph = ({ coords }, timeZone: string) => {
     const svg = d3.select("#chart");
     let sunGraph = d3.select("#sun-graph");
     const {latitude, longitude} = coords;
@@ -102,7 +102,7 @@ const buildSunGraph = ({coords}, timeZone) => {
     const currentDate = DateTime.now().setZone(timeZone);
     
     const line = d3.area()
-        .defined((d, i) => {
+        .defined((d: Date, i: number) => {
             if(d[1] === "nadir") {
                 const nextDate = linesData[1][i+1];
                 if(nextDate) {
@@ -112,8 +112,8 @@ const buildSunGraph = ({coords}, timeZone) => {
             }
             return true;
         })
-        .x((d, i) => x(new Date(year,0,i+1)))
-        .y(d => y(d[0]));
+        .x((_: Date, i: number) => x(new Date(year,0,i+1)))
+        .y((d: Date) => y(d[0]));
 
     if (sunGraph.empty()) {
         sunGraph = svg.append("g").attr("id", "sun-graph")
@@ -128,7 +128,7 @@ const buildSunGraph = ({coords}, timeZone) => {
 
         circle.attr("cx", x(currentDate))
         .attr("cy", y(currentDate.hour + currentDate.minute / 60))
-        .on("mouseover", e => {
+        .on("mouseover", (e: MouseEvent) => {
             const left = e.pageX;
             const top = e.pageY;
             tooltip.transition()
@@ -147,14 +147,14 @@ const buildSunGraph = ({coords}, timeZone) => {
         .append("path")        
         .attr("d", d3.geoPath(projection))
         .attr("class", "streams")
-        .style("fill", (d, i) => contourColors[i]);
+        .style("fill", (_: object, i: number) => contourColors[i]);
 
     sunGraph.selectAll("g")
         .data(linesData)
         .enter()
         .append("path")
         .attr("d", line)
-        .attr("stroke", (d, i) => lineColors[i].color)
+        .attr("stroke", (_: object, i: number) => lineColors[i].color)
         .attr("stroke-width", 3)
         .attr("class", "lines")
         .attr("fill", "none");
@@ -164,7 +164,7 @@ const buildSunGraph = ({coords}, timeZone) => {
         .attr("cy", y(currentDate.hour + currentDate.minute / 60))
         .attr("r", "6px")
         .attr("fill", circleColor)
-        .on("mouseover", e => {
+        .on("mouseover", (e: MouseEvent) => {
             const left = e.pageX;
             const top = e.pageY;
             tooltip.transition()

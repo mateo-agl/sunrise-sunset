@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Search } from "./components/Search.jsx";
+import { Search } from "./components/Search";
 import SunCalc from "suncalc";
 import { DateTime } from "luxon";
 import { buildSunGraph } from "./d3";
@@ -78,7 +78,7 @@ export const App = () => {
       async ({coords}) => {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const name = timeZone.split("/")[1].replace("_", " ");
-        const latLon = { 
+        const latLon: LocationObj = { 
           latitude: coords.latitude,
           longitude: coords.longitude,
           name: name,

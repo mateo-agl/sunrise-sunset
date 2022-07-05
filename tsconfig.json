@@ -1,9 +1,8 @@
 {
     "compilerOptions": {
-    "esModuleInterop": true,
+      "esModuleInterop": true,
       "jsx": "react",
-      "types": [
-        "node"
-      ],
+      "types": ["node", "express"],
     },
+    "include": ["server.ts", "./src/*"]
 }

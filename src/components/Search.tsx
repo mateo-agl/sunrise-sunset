@@ -1,5 +1,6 @@
+import React from "react";
 import { ReactComponent as SearchBtn } from "../assets/search.svg";
-import { Form, Button, ListGroup, Col, Row } from 'react-bootstrap';
+import { Form, Button, ListGroup, Col, Row } from "react-bootstrap";
 
 export const Search = ({ getMatches, getLocation, handleInput, city: { matches }, reset }) => (
     <Row xs="auto" className="mx-1 mt-2">
@@ -18,7 +19,7 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { matches }
             >
                 <SearchBtn/>
             </Button>
-            <ListGroup as="ul" className="position-absolute top-100 w-100" tabIndex="-1">
+            <ListGroup as="ul" className="position-absolute top-100 w-100" tabIndex={-1}>
                 {
                     matches.map((c, i) => (
                         c === "No matches found"

@@ -1,3 +1,4 @@
+import React from "react";
 import { Card } from "react-bootstrap";
 import { Chart } from "./MainComponents/Chart";
 import { List } from "./MainComponents/List";
