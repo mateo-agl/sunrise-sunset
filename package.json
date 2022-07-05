@@ -19,7 +19,9 @@
   },
   "scripts": {
     "client": "react-scripts start",
-    "start": "npx tsc server.ts & nodemon server.js",
+    "postinstall": "tsc server.ts --outDir dist",
+    "start": "tsc server.ts --outDir dist & node dist/server.js",
+    "dev-start": "tsc server.ts --outDir dist & nodemon dist/server.js",
     "build": "react-scripts build"
   },
   "eslintConfig": {

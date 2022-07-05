@@ -1,1 +1,1 @@
-web: npx tsc server.ts & node server.js
+web: node dist/server.js
