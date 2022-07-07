@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Search } from "./components/Search";
 import SunCalc from "suncalc";
 import { DateTime } from "luxon";
@@ -48,7 +48,7 @@ export const App = () => {
 
   const reset = () => setCity({...city, matches: []});
 
-  const getLocation = async (obj: LocationObj) => {
+  const getLocation = useCallback(async (obj: LocationObj) => {
     const url = `${hostName}/city?${!obj.timeZone ? `lat=${obj.latitude}&lon=${obj.longitude}` : ""}&name=${obj.name}`;
     const { data } = await axios.get(url);
     const timeZone: string = obj.timeZone ? obj.timeZone : data.timeZone;
@@ -56,14 +56,14 @@ export const App = () => {
 
     buildSunGraph(position, timeZone);
 
-    setCity({
-      ...city,
+    setCity(c => ({
+      ...c,
       fullName: `${obj.name}, ${data.countryName} - ${DateTime.now().year}`,
       matches: [],
       times: SunCalc.getTimes(DateTime.now(), obj.latitude, obj.longitude),
       timeZone: timeZone
-    });
-  };
+    }));
+  }, [hostName]);
   
   useEffect(() => {
     let latLon: any = localStorage.getItem("location");
@@ -92,7 +92,7 @@ export const App = () => {
           fullName: "Couldn't get your location. Please search a city."
       }))
     );
-  }, []);
+  }, [getLocation]);
 
   return (
     <Container as="main" fluid>
