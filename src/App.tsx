@@ -5,7 +5,8 @@ import SunCalc from "suncalc";
 import { DateTime } from "luxon";
 import { buildSunGraph } from "./d3";
 import { Main } from "./components/Main";
-import { Container } from "react-bootstrap";
+import { Map } from "./components/Map";
+import { Col, Container, Row } from "react-bootstrap";
 import { ICity } from "country-state-city/dist/lib/interface.js";
 import "./app.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -15,7 +16,9 @@ interface AppState {
   matches: Array<ICity | string>,
   times: boolean | Object,
   timeZone: string,
-  allCities: Array<ICity>
+  allCities: Array<ICity>,
+  lat?: number,
+  lon?: number
 }
 
 interface LocationObj {
@@ -61,7 +64,9 @@ export const App = () => {
       fullName: `${obj.name}, ${data.countryName} - ${DateTime.now().year}`,
       matches: [],
       times: SunCalc.getTimes(DateTime.now(), obj.latitude, obj.longitude),
-      timeZone: timeZone
+      timeZone: timeZone,
+      lat: obj.latitude,
+      lon: obj.longitude
     }));
   }, [hostName]);
   
@@ -74,28 +79,26 @@ export const App = () => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      async ({coords}) => {
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const name = timeZone.split("/")[1].replace("_", " ");
-        const latLon: LocationObj = { 
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          name: name,
-          timeZone: timeZone
-        };
-        localStorage.setItem("location", JSON.stringify(latLon));
-        getLocation({ ...latLon });
-      },
-      () => setCity(c => ({
-          ...c,
-          fullName: "Couldn't get your location. Please search a city."
-      }))
-    );
+    navigator.geolocation.getCurrentPosition(({coords}) => {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const name = timeZone.split("/")[1].replace("_", " ");
+      const latLon: LocationObj = { 
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        name: name,
+        timeZone: timeZone
+      };
+      localStorage.setItem("location", JSON.stringify(latLon));
+      getLocation({ ...latLon });
+    },
+    () => setCity(c => ({
+        ...c,
+        fullName: "Couldn't get your location. Please search a city."
+    })));
   }, [getLocation]);
 
   return (
-    <Container as="main" fluid>
+    <Container fluid>
       <Search
         getMatches={getMatches}
         getLocation={getLocation}
@@ -103,7 +106,14 @@ export const App = () => {
         city={city}
         reset={reset}
       />
-      <Main city={city}/>
+      <Row>
+        <Col as="main" xxl={10} xl={9}>
+          <Main city={city}/>
+        </Col>
+        <Col xxl={2} xl={3} className="map-cont">
+          <Map lat={city.lat} lon={city.lon} />
+        </Col>
+      </Row>
     </Container>
   )
 };
