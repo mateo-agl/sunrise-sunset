@@ -1,8 +1,15 @@
 # Sunrise Sunset
 
-Aplicación hecha con React y D3, sirve para obtener información sobre la luz solar en determinada localización. Utiliza las coordenadas del usuario o de cualquier ciudad para obtener la duración de los crepúsculos astronómico, náutico y civil, del día, horas doradas, medio día y media noche.
+Aplicación hecha con React y D3, sirve para obtener información sobre la luz solar en determinada localización. Utiliza las coordenadas del usuario o el nombre de cualquier ciudad que se busque para obtener la duración de los crepúsculos astronómico, náutico y civil, del día, horas doradas, medio día y media noche.
 
 Demo: https://sunrise-sunset-data.herokuapp.com/
+
+## API
+```/city/```
+- GET: Obtiene el nombre del país y/o zona horaria de una ciudad.
+
+```/match_cities/```
+- GET: Obtiene un array de 5 ciudades cuyos nombres coinciden con la búsqueda.
 
 ## Instalación
 
