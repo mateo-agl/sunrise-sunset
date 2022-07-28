@@ -36,6 +36,7 @@ body {
 }
 
 .list-group-item:hover {
+    user-select: none;
     background-color: rgb(217, 232, 255);
 }
 

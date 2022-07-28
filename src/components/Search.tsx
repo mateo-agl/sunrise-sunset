@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactComponent as SearchBtn } from "../assets/search.svg";
 import { Form, Button, ListGroup, Col, Row } from "react-bootstrap";
+import { ICity } from "country-state-city/dist/lib/interface";
 
 export const Search = ({ getMatches, getLocation, handleInput, city: { matches }, reset }) => (
     <Row xs="auto" className="mx-1 mt-2">
@@ -21,17 +22,17 @@ export const Search = ({ getMatches, getLocation, handleInput, city: { matches }
             </Button>
             <ListGroup as="ul" className="position-absolute top-100 w-100" tabIndex={-1}>
                 {
-                    matches.map((c, i) => (
-                        c === "No matches found"
+                    matches.map((c: ICity | string, i: number) => (
+                        typeof c === "string"
                             ? <ListGroup.Item as="li" key={i}>
-                                <label>{c}</label>
+                                {c}
                             </ListGroup.Item>
                             : <ListGroup.Item
                                 as="li"
                                 key={i}
                                 onClick={() => getLocation(c)}
                             >
-                                <label>{`${c.name}, ${c.countryCode}`}</label>
+                                {`${c.name}, ${c.countryCode}`}
                             </ListGroup.Item>
                     ))
                 }
